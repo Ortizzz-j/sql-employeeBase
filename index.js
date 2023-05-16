@@ -89,7 +89,7 @@ async function employees() {
 
 async function addDep(){
     try {
-        db.query('INSERT INTO departments(name) VALUES (?)', [])
+        db.query('INSERT INTO departments(name) VALUES (?)', [], (err, result))
     }
 }
 
