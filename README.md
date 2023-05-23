@@ -6,7 +6,7 @@ to make it easy for an employer to view their employees and there roles in there
 
 ## Improvements Needed
 
-currently need to make it so that the tables join when one is clicked after the other and also to be able to add an employee, role, or department.
+currently need to make it so that the tables join when one is clicked after the other and also to be able to add an employee, role, or department. The project isnt completed but i am just trying to keep up and not fall behind in class.
 
 ## Lesson Learned
 
