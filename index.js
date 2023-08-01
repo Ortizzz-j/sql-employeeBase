@@ -22,13 +22,13 @@ function menu() {
                     name: 'whereTo',
                     type: 'list',
                     message: 'What would you like to do?',
-                    choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee']
+                    choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role']
                 }
             ]
         )
         .then((answers) => {
             if (answers.whereTo === 'view all departments') {
-                return employees();
+                return departments();
             }
             else if (answers.whereTo === 'view all roles') {
                 return roles();
@@ -45,6 +45,9 @@ function menu() {
             else if (answers.whereTo === 'add an employee') {
                 return addEmp();
             }
+            else if (answers.whereTo === 'update an employee role') {
+                return updateEmp();
+            }
         }
         )
 }
@@ -59,8 +62,6 @@ async function addDep() {
         type: 'input'
     }])
 
-    // console.log(answers)
-
     db.query('INSERT INTO departments(name) VALUES (?)', [answers.newDep])
         .then(results => {
             console.log('Deparment added...');
@@ -69,16 +70,10 @@ async function addDep() {
         .catch(err => {
             console.error(err);
         });
-    // try {
-    //    const results = await db.query('INSERT INTO departments(?) VALUES (?)', ['name', answers.newDep])
-    // } catch (err){
-    //     console.log(err)
-    // }
 }
 
 async function addEmp() {
     db.query('SELECT * FROM departments').then(async dbRes => {
-        console.table(dbRes)
 
         const employees = dbRes.map(employee => {
             return {
@@ -116,17 +111,59 @@ async function addEmp() {
 
         console.log(answers);
 
-        db.query('INSERT INTO role SET ?', [answers]).then(dbRes => {
-            console.log('role created!');
+        db.query('INSERT INTO employees SET ?', [answers]).then(dbRes => {
+            console.log(dbRes);
             menu()
         })
     })
 
 
 }
+
+async function updateEmp() {
+    db.query('SELECT * FROM employees').then(async dbRes => {
+        
+        const employees = dbRes.map(employee => {
+            return {
+                name: employee.first_name + ' ' + employee.last_name,
+                value: employee.id,
+                role: employee.role_id
+            };
+        })
+        console.log(employees);
+
+        const roles = dbRes.map(role => {
+            return {
+                name: role.title,
+                id: role.id,
+            };
+        })
+
+        console.log(roles)
+        const answers = await inquirer.prompt([
+            {
+                name: 'empID',
+                message: 'What is the id of the employee?',
+                type: 'list',
+                choices: employees
+            },
+            {
+                name: 'role_id',
+                message: 'What is the new role id?',
+                type: 'list',
+                choices: roles
+            }
+        ])
+
+        db.query('UPDATE employees SET role_id = ? WHERE id = ?', [answers.role_id, answers.empID]).then(dbRes => {
+            console.log('role updated!');
+            menu()
+        })
+ })
+}
+
 async function addRole() {
     db.query('SELECT * FROM departments').then(async dbRes => {
-        console.log(dbRes)
 
         const departments = dbRes.map(department => {
             return {
@@ -134,8 +171,6 @@ async function addRole() {
                 value: department.id,
             };
         })
-
-        console.log(departments)
 
         const answers = await inquirer.prompt([
             {
@@ -157,8 +192,6 @@ async function addRole() {
 
         ])
 
-        console.log(answers);
-
         db.query('INSERT INTO role SET ?', [answers]).then(dbRes => {
             console.log('role created!');
             menu()
@@ -168,7 +201,7 @@ async function addRole() {
 
 }
 
-async function employees() {
+async function departments() {
     try {
         db.query('SELECT * FROM departments', function (err, results) {
             console.table(results)
@@ -203,6 +236,8 @@ async function employees() {
         console.log(err)
     }
 }
+
+
 
 
 
